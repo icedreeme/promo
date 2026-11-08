@@ -8,7 +8,8 @@ const CFG = {
   track: 'воздушный шар',
   listenUrl: 'https://soundcloud.com/icedreeme/vozdushniyshar',// ← ссылка на трек в SoundCloud
   shareUrl: 'https://t.me/dreeme_shar_bot/shar_promo',         // ← ссылка на саму игру (t.me/имя_бота/имя_приложения)
-  claimUrl: 'https://dreeme-mp3.jimmy19work.workers.dev',                      // ← адрес Cloudflare Worker (bot-worker.js), который присылает mp3
+  botUrl: 'https://t.me/dreeme_shar_bot',  // ← бот: запасной способ получить mp3 (/start mp3)
+  claimUrl:'https://dreeme-mp3.jimmy19work.workers.dev',                      // ← адрес Cloudflare Worker (bot-worker.js), который присылает mp3
   intro: [
     'привет. я dreeme.',
     'это мой новый трек — «воздушный шар».',
@@ -863,11 +864,17 @@ function showCard() {
 }
 $('bListen').addEventListener('click', () => { haptic('medium'); openLink(CFG.listenUrl); });
 // mp3 в личку: бот присылает трек тому, кто прошёл игру
+// запасной путь: открыть чат с ботом командой /start mp3 — трек пришлёт сам бот (через webhook)
+function claimViaBot(b) {
+  b.textContent = 'открываю чат с ботом — трек придёт туда';
+  const url = CFG.botUrl + '?start=mp3';
+  try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {}
+  window.open(url, '_blank');
+}
 $('bMp3').addEventListener('click', async () => {
   const b = $('bMp3');
   if (b.dataset.busy || b.dataset.done) return;
-  if (!tg || !tg.initData) { b.textContent = 'открой игру в телеграме, чтобы получить mp3'; return; }
-  if (!CFG.claimUrl) { b.textContent = 'mp3 скоро будет доступен'; return; }
+  if (!tg || !tg.initData || !CFG.claimUrl) { haptic('medium'); claimViaBot(b); return; }
   b.dataset.busy = 1; b.textContent = 'отправляю…'; haptic('medium');
   // боту нужно разрешение писать в личку (если человек ещё не запускал бота)
   const allowed = await new Promise(res => {
@@ -882,15 +889,14 @@ $('bMp3').addEventListener('click', async () => {
     // text/plain — «простой» запрос без предварительной проверки CORS, так надёжнее во встроенных браузерах
     r = await fetch(CFG.claimUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ initData: tg.initData }) });
   } catch (e) {
-    b.textContent = 'нет связи с сервером, нажми ещё раз (код: net)';
-    delete b.dataset.busy; return;
+    delete b.dataset.busy; claimViaBot(b); return;   // сервер недоступен из этого браузера → через бота
   }
   try {
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || ('http ' + r.status));
     b.textContent = 'готово! трек уже в чате с ботом ✓'; b.dataset.done = 1; haptic('success');
   } catch (e) {
-    b.textContent = 'не получилось, нажми ещё раз (код: ' + String(e.message || e).slice(0, 60) + ')';
+    delete b.dataset.busy; claimViaBot(b); return;
   }
   delete b.dataset.busy;
 });
