@@ -877,13 +877,19 @@ $('bMp3').addEventListener('click', async () => {
     } catch (e) { res(true); }
   });
   if (!allowed) { b.textContent = 'разреши боту писать тебе и нажми ещё раз'; delete b.dataset.busy; return; }
+  let r = null;
   try {
-    const r = await fetch(CFG.claimUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ initData: tg.initData }) });
+    r = await fetch(CFG.claimUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ initData: tg.initData }) });
+  } catch (e) {
+    b.textContent = 'нет связи с сервером, нажми ещё раз (код: net)';
+    delete b.dataset.busy; return;
+  }
+  try {
     const j = await r.json();
-    if (!j.ok) throw new Error(j.error);
+    if (!j.ok) throw new Error(j.error || ('http ' + r.status));
     b.textContent = 'готово! трек уже в чате с ботом ✓'; b.dataset.done = 1; haptic('success');
   } catch (e) {
-    b.textContent = 'не получилось, нажми ещё раз';
+    b.textContent = 'не получилось, нажми ещё раз (код: ' + String(e.message || e).slice(0, 60) + ')';
   }
   delete b.dataset.busy;
 });
