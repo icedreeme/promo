@@ -7,8 +7,8 @@ const CFG = {
   artist: 'dreeme',
   track: 'воздушный шар',
   listenUrl: 'https://soundcloud.com/icedreeme/vozdushniyshar',// ← ссылка на трек в SoundCloud
-  shareUrl: 'https://t.me/',              // ← ссылка на саму игру (t.me/имя_бота/имя_приложения)
-  claimUrl: '',                            // ← адрес Cloudflare Worker (bot-worker.js), который присылает mp3
+  shareUrl: 'https://t.me/dreeme_shar_bot/shar_promo',         // ← ссылка на саму игру (t.me/имя_бота/имя_приложения)
+  claimUrl: 'https://dreeme-mp3.jimmy19work.workers.dev',                      // ← адрес Cloudflare Worker (bot-worker.js), который присылает mp3
   intro: [
     'привет. я dreeme.',
     'это мой новый трек — «воздушный шар».',
