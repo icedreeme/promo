@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>dreeme — воздушный шар</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  html, body { margin:0; height:100%; background:#fff; overflow:hidden; overscroll-behavior:none; }
+  body { font-family:'Caveat', cursive; color:#222; -webkit-user-select:none; user-select:none;
+         -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent; touch-action:none; }
+  canvas { display:block; position:fixed; inset:0; touch-action:none; }
+  .hidden { display:none !important; }
+  .sketch { border:2px solid #2a2a2a; border-radius:255px 15px 225px 15px / 15px 225px 15px 255px; background:#fff; }
+
+  #loading { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; font-size:30px; background:#fff; z-index:30; }
+
+  #dlg { position:fixed; inset:0; z-index:10; display:flex; align-items:flex-end; justify-content:center; padding:0 14px calc(18px + env(safe-area-inset-bottom)); box-sizing:border-box; }
+  #dlg .box { position:relative; width:100%; max-width:460px; display:flex; gap:10px; align-items:flex-start; padding:12px 14px 26px; box-sizing:border-box; box-shadow:3px 4px 0 rgba(0,0,0,.08); }
+  #dlgFace { width:78px; height:78px; flex:0 0 78px; object-fit:cover; }
+  #dlgText { font-size:25px; line-height:1.15; min-height:84px; padding-top:4px; }
+  #dlg .more { position:absolute; right:16px; bottom:4px; font-size:20px; opacity:.55; animation:blink 1.2s infinite; }
+  @keyframes blink { 50% { opacity:.15; } }
+
+  #card { position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.82); padding:16px; box-sizing:border-box; animation:fade .8s; }
+  @keyframes fade { from { opacity:0; } }
+  #card .box { width:100%; max-width:360px; padding:18px 18px 16px; box-sizing:border-box; text-align:center; }
+  #card .cover { width:150px; height:150px; display:block; margin:0 auto 4px; mix-blend-mode:multiply; }
+  #card .t1 { font-size:40px; font-weight:700; line-height:1; }
+  #card .t2 { font-size:28px; margin-bottom:6px; }
+  #card .rel { font-size:22px; opacity:.75; }
+  #card .stats { font-size:21px; margin:8px 0 12px; line-height:1.1; }
+  #card button { display:block; width:100%; margin:9px 0 0; padding:9px 10px 7px; font:700 25px 'Caveat', cursive; color:#fff; background:#222; border:2px solid #222; border-radius:255px 15px 225px 15px / 15px 225px 15px 255px; cursor:pointer; }
+  #card button.ghost { background:#fff; color:#222; }
+  #card button:active { transform:scale(.97); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="loading">загрузка…</div>
+
+<div id="dlg" class="hidden">
+  <div class="box sketch">
+    <img id="dlgFace" alt="">
+    <div id="dlgText"></div>
+    <div class="more">тап ›</div>
+  </div>
+</div>
+
+<div id="card" class="hidden">
+  <div class="box sketch">
+    <img class="cover" src="assets/cover.jpg" alt="обложка">
+    <div class="t1" id="cArtist"></div>
+    <div class="t2" id="cTrack"></div>
+    <div class="stats" id="cStats"></div>
+    <button id="bMp3">получить mp3</button>
+    <button id="bListen" class="ghost">слушать на SoundCloud</button>
+    <button id="bShare" class="ghost">поделиться игрой</button>
+    <button id="bAgain" class="ghost">сыграть ещё раз</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
