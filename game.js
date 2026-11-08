@@ -879,7 +879,8 @@ $('bMp3').addEventListener('click', async () => {
   if (!allowed) { b.textContent = 'разреши боту писать тебе и нажми ещё раз'; delete b.dataset.busy; return; }
   let r = null;
   try {
-    r = await fetch(CFG.claimUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ initData: tg.initData }) });
+    // text/plain — «простой» запрос без предварительной проверки CORS, так надёжнее во встроенных браузерах
+    r = await fetch(CFG.claimUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ initData: tg.initData }) });
   } catch (e) {
     b.textContent = 'нет связи с сервером, нажми ещё раз (код: net)';
     delete b.dataset.busy; return;
